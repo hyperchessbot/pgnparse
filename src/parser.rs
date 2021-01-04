@@ -1,4 +1,5 @@
 use shakmaty::variants::{Chess, Atomic, Antichess, KingOfTheHill, ThreeCheck, Crazyhouse, RacingKings, Horde};
+use shakmaty::san::{San};
 use pgn_reader::{Visitor, Skip, RawHeader, SanPlus, BufferedReader};
 use serde::{Deserialize, Serialize};
 
@@ -114,7 +115,15 @@ impl Visitor for ParsingState {
     }
 
     fn san(&mut self, san_plus: SanPlus) {
-		
+		let san_orig = san_plus.san;
+		let san_str = format!("{}", san_orig);        
+		let san_result:std::result::Result<San, _> = san_str.parse();
+		match san_result {
+			Ok(san) => {
+				println!("san {}", san);
+			},
+			_ => println!("{:?}", san_result)
+		}		
     }
 
     fn end_game(&mut self) -> Self::Result {
