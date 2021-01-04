@@ -1,0 +1,13 @@
+[package]
+name = "pgnparse"
+version = "0.1.0"
+authors = ["hyperchessbot <hyperchessbot@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+shakmaty = "0.17.1"
+pgn-reader = "0.16.0"
+
+[[bin]]
+name = "pgnparse"
+path = "src/pgnparse.rs"
