@@ -11,3 +11,5 @@ pgn-reader = "0.16.0"
 [[bin]]
 name = "pgnparse"
 path = "src/pgnparse.rs"
+
+[lib]
