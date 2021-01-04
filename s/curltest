@@ -1,3 +1,0 @@
-#!/bin/bash
-
-curl -N -H "Authorization: Bearer " https://lichess.org/api/bot/game/stream/9aDaJumE
