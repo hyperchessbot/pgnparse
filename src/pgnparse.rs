@@ -5,7 +5,7 @@ fn main(){
 [White "White"]
 [Black "Black"]
 
-1. Nf3 f6 2. e3 e6
+1. Nf3 e5 2. Nxe5 d5 3. e3
 "#;
 	
 	let result = parse_pgn_to_json_string(pgn.to_string());
