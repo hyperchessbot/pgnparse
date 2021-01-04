@@ -1,4 +1,4 @@
-use shakmaty::variants::{Chess, Atomic, Antichess, KingOfTheHill, ThreeCheck, Crazyhouse, RacingKings, Horde};
+use shakmaty::variants::{Antichess, Atomic, Chess, Crazyhouse, Horde, KingOfTheHill, RacingKings, ThreeCheck};
 use shakmaty::san::{San};
 use shakmaty::uci::{Uci};
 use shakmaty::fen;
@@ -9,16 +9,16 @@ use serde::{Deserialize, Serialize};
 /// variant enum
 #[derive(Debug)]
 pub enum Variant{
-	VariantStandard,
-	VariantChess960,
-	VariantFromPosition,
-	VariantAtomic,
 	VariantAntichess,
-	VariantKingOfTheHill,
-	VariantThreeCheck,
+	VariantAtomic,	
+	VariantChess960,
 	VariantCrazyhose,
-	VariantRacingKings,
+	VariantFromPosition,
 	VariantHorde,
+	VariantKingOfTheHill,
+	VariantRacingKings,
+	VariantStandard,	
+	VariantThreeCheck,
 }
 
 use Variant::*;
@@ -63,13 +63,13 @@ impl PgnInfo {
 
 /// parsing state
 struct ParsingState{
-	chess_pos: Chess,
-	atomic_pos: Atomic,
-	racingkings_pos: RacingKings,
-	horde_pos: Horde,
-	crazyhouse_pos: Crazyhouse,
-	kingofthehill_pos: KingOfTheHill,
 	antichess_pos: Antichess,
+	atomic_pos: Atomic,
+	chess_pos: Chess,	
+	crazyhouse_pos: Crazyhouse,
+	horde_pos: Horde,
+	kingofthehill_pos: KingOfTheHill,
+	racingkings_pos: RacingKings,
 	three_check_pos: ThreeCheck,
 	variant: Variant,
 	pgn_info: PgnInfo,
@@ -78,14 +78,14 @@ struct ParsingState{
 impl ParsingState{
 	fn new() -> ParsingState{
 		ParsingState{
-			chess_pos: Chess::default(),
-			atomic_pos: Atomic::default(),
-			racingkings_pos: RacingKings::default(),
-			horde_pos: Horde::default(),
-			crazyhouse_pos: Crazyhouse::default(),
-			kingofthehill_pos: KingOfTheHill::default(),
-			three_check_pos: ThreeCheck::default(),
 			antichess_pos: Antichess::default(),
+			atomic_pos: Atomic::default(),
+			chess_pos: Chess::default(),			
+			crazyhouse_pos: Crazyhouse::default(),
+			horde_pos: Horde::default(),
+			kingofthehill_pos: KingOfTheHill::default(),
+			racingkings_pos: RacingKings::default(),
+			three_check_pos: ThreeCheck::default(),
 			variant: VariantStandard,
 			pgn_info: PgnInfo::new(),
 		}
@@ -142,6 +142,22 @@ gen_make_move!(
 	VariantThreeCheck, three_check_pos,
 );
 
+fn variant_name_to_variant(variant: &str) -> Variant {
+	match variant.to_lowercase().as_str() {
+		"antichess" | "anti chess" | "giveaway" | "give away" => VariantAntichess,
+		"atomic" => VariantAtomic,
+		"chess960" | "chess 960" => VariantChess960,
+		"crazyhouse" | "crazy house" => VariantCrazyhose,
+		"fromposition" | "from position" => VariantFromPosition,								
+		"horde" => VariantHorde,
+		"kingofthehill" | "king of the hill" | "koth" => VariantKingOfTheHill,
+		"racingkings" | "racing kings" => VariantRacingKings,
+		"standard" => VariantStandard,
+		"threecheck" | "three check" => VariantThreeCheck,
+		_ => VariantStandard,
+	}
+}
+
 /// implement visitor
 impl Visitor for ParsingState {
     type Result = String;
@@ -156,19 +172,7 @@ impl Visitor for ParsingState {
 						self.pgn_info.insert_header(key_str.to_string(), value_str.to_string());
 						
 						if key_str == "Variant" {
-							self.variant = match value_str.to_lowercase().as_str() {
-								"standard" => VariantStandard,
-								"chess960" | "chess 960" => VariantChess960,
-								"fromposition" | "from position" => VariantFromPosition,								
-								"atomic" => VariantAtomic,
-								"antichess" | "anti chess" | "giveaway" | "give away" => VariantAntichess,
-								"horde" => VariantHorde,
-								"racingkings" | "racing kings" => VariantRacingKings,
-								"kingofthehill" | "king of the hill" | "koth" => VariantKingOfTheHill,
-								"crazyhouse" | "crazy house" => VariantCrazyhose,
-								"threecheck" | "three check" => VariantThreeCheck,
-								_ => VariantStandard,
-							};
+							self.variant = variant_name_to_variant(value_str);
 							
 							println!("variant set to {:?}", self.variant);
 						}
