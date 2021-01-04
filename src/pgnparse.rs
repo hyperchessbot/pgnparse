@@ -12,4 +12,8 @@ fn main(){
 	let result = parse_pgn_to_rust_struct(pgn.to_string());
 	
 	println!("{:?}", result);
+	
+	let result = parse_pgn_to_json_string(pgn.to_string());
+	
+	println!("{}", result);
 }

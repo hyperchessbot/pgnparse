@@ -102,9 +102,9 @@ macro_rules! gen_make_move {
                 $(
                     $variant => {
 						let san_orig = san_plus.san;
-						let san_str = format!("{}", san_orig);        
-						println!("processing {}", san_str);
+						let san_str = format!("{}", san_orig);        						
 						let san_result:std::result::Result<San, _> = san_str.parse();
+						
 						match san_result {
 							Ok(san) => {
 								let move_result = san.to_move(&parsing_state.$pos);
@@ -176,8 +176,6 @@ impl Visitor for ParsingState {
 						
 						if key_str == "Variant" {
 							self.variant = variant_name_to_variant(value_str);
-							
-							println!("variant set to {:?}", self.variant);
 						}
 					},
 					Err(err) => println!("header value utf8 parse error {:?}", err)
