@@ -1,11 +1,12 @@
 use pgnparse::parser::*;
 
 fn main(){
-	let pgn = r#"[Variant "Atomic"]
+	let pgn = r#"[FEN "8/8/8/8/8/7k/8/7K w - - 0 1"]
 [White "White"]
 [Black "Black"]
+[Variant "Atomic"]
 
-1. Nf3 e5 2. Nxe5 d5 3. e3
+1. Kh2 Kg2
 "#;
 	
 	let result = parse_pgn_to_json_string(pgn.to_string());

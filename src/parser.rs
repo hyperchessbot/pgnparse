@@ -2,6 +2,7 @@ use shakmaty::variants::{Antichess, Atomic, Chess, Crazyhouse, Horde, KingOfTheH
 use shakmaty::san::{San};
 use shakmaty::uci::{Uci};
 use shakmaty::fen;
+use shakmaty::fen::Fen;
 use shakmaty::Position;
 use pgn_reader::{Visitor, Skip, RawHeader, SanPlus, BufferedReader};
 use serde::{Deserialize, Serialize};
@@ -72,6 +73,7 @@ struct ParsingState{
 	racingkings_pos: RacingKings,
 	three_check_pos: ThreeCheck,
 	variant: Variant,
+	check_custom_fen: bool,
 	pgn_info: PgnInfo,
 }
 
@@ -87,6 +89,7 @@ impl ParsingState{
 			racingkings_pos: RacingKings::default(),
 			three_check_pos: ThreeCheck::default(),
 			variant: VariantStandard,
+			check_custom_fen: true,
 			pgn_info: PgnInfo::new(),
 		}
 	}
@@ -189,6 +192,91 @@ impl Visitor for ParsingState {
     }
 
     fn san(&mut self, san_plus: SanPlus) {		
+		if self.check_custom_fen {
+			self.check_custom_fen = false;
+			
+			if let Some(fen) = self.pgn_info.headers.get("FEN") {
+				let castling_mode = match self.variant {
+					VariantChess960 => shakmaty::CastlingMode::Chess960,
+					_ => shakmaty::CastlingMode::Standard,
+				};
+				
+				match self.variant {
+					VariantAntichess => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.antichess_pos = pos;
+						}
+						
+					},
+					VariantAtomic => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.atomic_pos = pos;
+						}
+						
+					},
+					VariantCrazyhose => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.crazyhouse_pos = pos;
+						}
+						
+					},
+					VariantHorde => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.horde_pos = pos;
+						}
+						
+					},
+					VariantKingOfTheHill => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.kingofthehill_pos = pos;
+						}
+						
+					},
+					VariantRacingKings => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.racingkings_pos = pos;
+						}
+						
+					},
+					VariantThreeCheck => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.three_check_pos = pos;
+						}
+						
+					},
+					_ => {
+						let pos = Fen::from_ascii(fen.as_bytes()).ok()
+                			.and_then(|f| f.position(castling_mode).ok());
+						
+						if let Some(pos) = pos {
+							self.chess_pos = pos;
+						}
+					}
+				}					
+			}
+		}
+		
 		make_move(self, san_plus);
     }
 
