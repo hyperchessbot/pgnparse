@@ -1,6 +1,6 @@
 [package]
 name = "pgnparse"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["hyperchessbot <hyperchessbot@gmail.com>"]
 edition = "2018"
 description = "Parse PGN to Rust struct ( headers as hash map, main line moves as san, uci, fen, epd records ) or to JSON. All lichess variants are supported. Custom starting position using FEN header is supported."
