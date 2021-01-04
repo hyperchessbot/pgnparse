@@ -29,8 +29,10 @@ use Variant::*;
 struct SanUciFenEpd {
 	san: String,
 	uci: String,
-	fen: String,
-	epd: String,
+	fen_before: String,
+	epd_before: String,
+	fen_after: String,
+	epd_after: String,
 }
 
 /// pgn headers and moves
@@ -111,12 +113,28 @@ macro_rules! gen_make_move {
 
 								match move_result {
 									Ok(m) => {
-										let uci_str = Uci::from_standard(&m).to_string();
-										let fen_str = format!("{}", fen::fen(&parsing_state.$pos));
-										let epd_str = format!("{}", fen::epd(&parsing_state.$pos));
-										let san_uci_fen_epd = SanUciFenEpd{san: san_str, uci: uci_str, fen: fen_str, epd: epd_str};						
-										parsing_state.pgn_info.push(san_uci_fen_epd);
+										let uci_str = match parsing_state.variant {
+											VariantChess960 => Uci::from_chess960(&m).to_string(),
+											_ => Uci::from_standard(&m).to_string()
+										};										
+										let fen_before_str = format!("{}", fen::fen(&parsing_state.$pos));
+										let epd_before_str = format!("{}", fen::epd(&parsing_state.$pos));
+										
 										parsing_state.$pos.play_unchecked(&m);
+										
+										let fen_after_str = format!("{}", fen::fen(&parsing_state.$pos));
+										let epd_after_str = format!("{}", fen::epd(&parsing_state.$pos));
+										
+										let san_uci_fen_epd = SanUciFenEpd{
+											san: san_str,
+											uci: uci_str,
+											fen_before: fen_before_str,
+											epd_before: epd_before_str,
+											fen_after: fen_after_str,
+											epd_after: epd_after_str,
+										};						
+										
+										parsing_state.pgn_info.push(san_uci_fen_epd);										
 									},
 									_ => println!("move error {:?}", move_result)
 								}				

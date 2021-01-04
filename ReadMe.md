@@ -31,7 +31,7 @@ fn main(){
 prints
 
 ```
-PgnInfo { headers: {"Black": "Black", "FEN": "8/8/8/8/8/7k/8/7K w - - 0 1", "White": "White", "Variant": "Atomic"}, moves: [SanUciFenEpd { san: "Kh2", uci: "h1h2", fen: "8/8/8/8/8/7k/8/7K w - - 0 1", epd: "8/8/8/8/8/7k/8/7K w - -" }, SanUciFenEpd { san: "Kg2", uci: "h3g2", fen: "8/8/8/8/8/7k/7K/8 b - - 1 1", epd: "8/8/8/8/8/7k/7K/8 b - -" }] }
-{"headers":{"Variant":"Atomic","FEN":"8/8/8/8/8/7k/8/7K w - - 0 1","Black":"Black","White":"White"},"moves":[{"san":"Kh2","uci":"h1h2","fen":"8/8/8/8/8/7k/8/7K w - - 0 1","epd":"8/8/8/8/8/7k/8/7K w - -"},{"san":"Kg2","uci":"h3g2","fen":"8/8/8/8/8/7k/7K/8 b - - 1 1","epd":"8/8/8/8/8/7k/7K/8 b - -"}]}
+PgnInfo { headers: {"Variant": "Atomic", "White": "White", "Black": "Black", "FEN": "8/8/8/8/8/7k/8/7K w - - 0 1"}, moves: [SanUciFenEpd { san: "Kh2", uci: "h1h2", fen_before: "8/8/8/8/8/7k/8/7K w - - 0 1", epd_before: "8/8/8/8/8/7k/8/7K w - -", fen_after: "8/8/8/8/8/7k/7K/8 b - - 1 1", epd_after: "8/8/8/8/8/7k/7K/8 b - -" }, SanUciFenEpd { san: "Kg2", uci: "h3g2", fen_before: "8/8/8/8/8/7k/7K/8 b - - 1 1", epd_before: "8/8/8/8/8/7k/7K/8 b - -", fen_after: "8/8/8/8/8/8/6kK/8 w - - 2 2", epd_after: "8/8/8/8/8/8/6kK/8 w - -" }] }
+{"headers":{"Black":"Black","Variant":"Atomic","FEN":"8/8/8/8/8/7k/8/7K w - - 0 1","White":"White"},"moves":[{"san":"Kh2","uci":"h1h2","fen_before":"8/8/8/8/8/7k/8/7K w - - 0 1","epd_before":"8/8/8/8/8/7k/8/7K w - -","fen_after":"8/8/8/8/8/7k/7K/8 b - - 1 1","epd_after":"8/8/8/8/8/7k/7K/8 b - -"},{"san":"Kg2","uci":"h3g2","fen_before":"8/8/8/8/8/7k/7K/8 b - - 1 1","epd_before":"8/8/8/8/8/7k/7K/8 b - -","fen_after":"8/8/8/8/8/8/6kK/8 w - - 2 2","epd_after":"8/8/8/8/8/8/6kK/8 w - -"}]}
 
 ```
