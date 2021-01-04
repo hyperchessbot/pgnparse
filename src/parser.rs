@@ -35,7 +35,7 @@ struct SanUciFenEpd {
 
 /// pgn headers and moves
 #[derive(Debug, Serialize, Deserialize)]
-struct PgnInfo {
+pub struct PgnInfo {
 	headers: std::collections::HashMap<String, String>,
 	moves: Vec<SanUciFenEpd>,
 }
@@ -309,5 +309,15 @@ pub fn parse_pgn_to_json_string(pgn_str: String) -> String {
 			println!("{:?}", err);
 			"".to_string()
 		}
+	}
+}
+
+/// parse pgn to rust struct
+pub fn parse_pgn_to_rust_struct(pgn_str: String) -> PgnInfo {
+	let parse_result = parse_pgn_to_json_string(pgn_str);
+		
+	match serde_json::from_str::<PgnInfo>(&parse_result) {
+		Ok(pgn_info) => pgn_info,
+		_ => PgnInfo::new(),
 	}
 }

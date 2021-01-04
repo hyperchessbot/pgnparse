@@ -9,7 +9,7 @@ fn main(){
 1. Kh2 Kg2
 "#;
 	
-	let result = parse_pgn_to_json_string(pgn.to_string());
+	let result = parse_pgn_to_rust_struct(pgn.to_string());
 	
-	println!("{}", result);
+	println!("{:?}", result);
 }
