@@ -26,7 +26,7 @@ use Variant::*;
 
 /// san, uci, fen, epd for move
 #[derive(Debug, Serialize, Deserialize)]
-struct SanUciFenEpd {
+pub struct SanUciFenEpd {
 	san: String,
 	uci: String,
 	fen_before: String,
@@ -38,28 +38,32 @@ struct SanUciFenEpd {
 /// pgn headers and moves
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PgnInfo {
-	headers: std::collections::HashMap<String, String>,
-	moves: Vec<SanUciFenEpd>,
+	pub headers: std::collections::HashMap<String, String>,
+	pub moves: Vec<SanUciFenEpd>,
 }
 
 /// implementation for PgnInfo
 impl PgnInfo {
-	fn new() -> PgnInfo {
+	/// create new pgn info
+	pub fn new() -> PgnInfo {
 		PgnInfo {
 			headers: std::collections::HashMap::new(),
 			moves: vec!(),
 		}
 	}
 	
-	fn push(&mut self, san_uci_fen_epd: SanUciFenEpd) {
+	/// push san uci fen epd
+	pub fn push(&mut self, san_uci_fen_epd: SanUciFenEpd) {
 		self.moves.push(san_uci_fen_epd);
 	}
 	
-	fn insert_header(&mut self, key: String, value: String) {
+	/// insert header
+	pub fn insert_header(&mut self, key: String, value: String) {
 		self.headers.insert(key, value);
 	}
 	
-	fn _get_header(&mut self, key:String) -> String {
+	/// get header
+	pub fn get_header(&mut self, key:String) -> String {
 		self.headers.get(&key).unwrap_or(&"?".to_string()).to_string()
 	}
 }
