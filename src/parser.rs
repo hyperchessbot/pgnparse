@@ -27,12 +27,12 @@ use Variant::*;
 /// san, uci, fen, epd for move
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SanUciFenEpd {
-	san: String,
-	uci: String,
-	fen_before: String,
-	epd_before: String,
-	fen_after: String,
-	epd_after: String,
+	pub san: String,
+	pub uci: String,
+	pub fen_before: String,
+	pub epd_before: String,
+	pub fen_after: String,
+	pub epd_after: String,
 }
 
 /// pgn headers and moves
