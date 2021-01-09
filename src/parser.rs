@@ -58,12 +58,19 @@ impl PgnInfo {
 	}
 	
 	/// insert header
-	pub fn insert_header(&mut self, key: String, value: String) {
+	pub fn insert_header<K, V>(&mut self, key: K, value: V)
+	where K: core::fmt::Display, V: core::fmt::Display {
+		let key = format!("{}", key);
+		let value = format!("{}", value);
+
 		self.headers.insert(key, value);
 	}
 	
 	/// get header
-	pub fn get_header(&mut self, key:String) -> String {
+	pub fn get_header<T>(&mut self, key:T) -> String
+	where T: core::fmt::Display {
+		let key = format!("{}", key);
+
 		self.headers.get(&key).unwrap_or(&"?".to_string()).to_string()
 	}
 }
@@ -167,6 +174,7 @@ gen_make_move!(
 	VariantThreeCheck, three_check_pos,
 );
 
+/// variant name to variant
 fn variant_name_to_variant(variant: &str) -> Variant {
 	match variant.to_lowercase().as_str() {
 		"antichess" | "anti chess" | "giveaway" | "give away" => VariantAntichess,
@@ -178,7 +186,7 @@ fn variant_name_to_variant(variant: &str) -> Variant {
 		"kingofthehill" | "king of the hill" | "koth" => VariantKingOfTheHill,
 		"racingkings" | "racing kings" => VariantRacingKings,
 		"standard" => VariantStandard,
-		"threecheck" | "three check" => VariantThreeCheck,
+		"threecheck" | "three check" | "3check" | "3 check" => VariantThreeCheck,
 		_ => VariantStandard,
 	}
 }
