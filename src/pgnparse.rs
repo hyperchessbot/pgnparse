@@ -16,4 +16,12 @@ fn main(){
 	let result = parse_pgn_to_json_string(pgn);
 	
 	println!("{}", result);
+
+	if let Ok(lines) = read_lines("test.pgn") {        
+        for line in lines {
+            if let Ok(line) = line {
+                println!("{}", line);
+            }
+        }
+    }
 }

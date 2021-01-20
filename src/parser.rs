@@ -6,6 +6,9 @@ use shakmaty::fen::Fen;
 use shakmaty::Position;
 use pgn_reader::{Visitor, Skip, RawHeader, SanPlus, BufferedReader};
 use serde::{Deserialize, Serialize};
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
 
 /// variant enum
 #[derive(Debug)]
@@ -351,4 +354,11 @@ where T: core::fmt::Display {
 		Ok(pgn_info) => pgn_info,
 		_ => PgnInfo::new(),
 	}
+}
+
+/// read lines of file
+pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
 }
