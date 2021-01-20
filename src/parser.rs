@@ -362,3 +362,87 @@ where P: AsRef<Path>, {
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
+
+/// pgn iterator
+pub struct PgnIterator {	
+	pub lines: io::Lines<io::BufReader<File>>,
+}
+
+/// pgn iterator implementation
+impl PgnIterator {
+	pub fn new<T>(filename: T) -> Option<PgnIterator>
+	where T: AsRef<Path> {
+		if let Ok(file) = File::open(filename) {
+			return Some(PgnIterator{
+				lines: io::BufReader::new(file).lines()
+			})
+		}
+
+		None
+	}
+}
+
+/// pgn reading states
+enum PgnReadingState {
+	/// wait head
+	WaitHead,
+	/// read head
+	ReadHead,
+	/// wait body
+	WaitBody,
+	/// read body
+	ReadBody,
+}
+
+/// Iterator trait for PgnIterator implementation
+impl std::iter::Iterator for PgnIterator {
+	type Item = String;
+
+	/// next pgn
+	fn next(&mut self) -> Option<Self::Item> {
+		let mut state = PgnReadingState::WaitHead;
+
+		let mut accum = String::new();
+        
+        loop{
+        	if let Some(Ok(line)) = self.lines.next() {
+        		if line.len() == 0 {
+        			match state {
+        				PgnReadingState::ReadBody => return Some(accum),
+        				PgnReadingState::WaitHead => {},
+        				PgnReadingState::ReadHead => {
+        					accum = accum + &line + "\n";
+
+        					state = PgnReadingState::WaitBody;
+        				},
+        				_ => accum = accum + &line + "\n"
+        			}
+        		} else {
+        			match state {
+        				PgnReadingState::WaitHead => {
+        					if line.chars().next().unwrap() != '[' {
+        						// waiting for head but not receiving a header
+        						return None
+        					}
+
+        					accum = line;
+
+        					state = PgnReadingState::ReadHead
+        				},
+        				PgnReadingState::WaitBody => {
+        					accum = accum + &line + "\n";
+
+        					state = PgnReadingState::ReadBody
+        				},
+        				_=> accum = accum + &line + "\n"
+        			}
+        		}
+        	} else {
+        		match state {
+        			PgnReadingState::ReadBody => return Some(accum),
+        			_ => return None
+        		}
+        	}
+        }        
+    }
+}

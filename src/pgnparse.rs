@@ -17,11 +17,15 @@ fn main(){
 	
 	println!("{}", result);
 
-	if let Ok(lines) = read_lines("test.pgn") {        
-        for line in lines {
-            if let Ok(line) = line {
-                println!("{}", line);
-            }
-        }
-    }
+	let iter = PgnIterator::new("test.pgn");
+
+	let mut i = 0;
+
+	if let Some(iter) = iter {
+		for pgn in iter {
+			println!("************\npgn {}\n************\n\n{}", i + 1, pgn);
+
+			i += 1;
+		}
+	}
 }

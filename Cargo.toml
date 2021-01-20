@@ -1,6 +1,6 @@
 [package]
 name = "pgnparse"
-version = "0.1.10"
+version = "0.1.11"
 authors = ["hyperchessbot <hyperchessbot@gmail.com>"]
 edition = "2018"
 keywords = ["pgn", "parse", "rust", "json"]
@@ -8,7 +8,7 @@ description = "Parse PGN to Rust struct ( headers as hash map, main line moves a
 license = "MIT"
 repository = "https://github.com/hyperchessbot/pgnparse"
 homepage = "https://github.com/hyperchessbot/pgnparse#pgnparse"
-documentation = "https://docs.rs/pgnparse/0.1.10"
+documentation = "https://docs.rs/pgnparse/0.1.11"
 readme = "ReadMe.md"
 
 [dependencies]
