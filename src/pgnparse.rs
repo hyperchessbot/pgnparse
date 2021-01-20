@@ -26,8 +26,16 @@ fn main(){
 	println!("pos for epd = {:?}", pos);
 
 	if let Some(pos) = pos {
-		let m = pos.get_random_weighted();
+		let m = pos.get_random_weighted_by_plays();
 
-		println!("random weighted move = {:?}", m);
+		println!("random weighted by plays = {:?} , plays = {}", m, m.unwrap().plays());
+
+		let m = pos.get_random_weighted_by_perf();
+
+		println!("random weighted by perf = {:?} , perf = {}", m, m.unwrap().perf());
+
+		let m = pos.get_random_mixed(50);
+
+		println!("random mixed = {:?}", m);
 	}
 }

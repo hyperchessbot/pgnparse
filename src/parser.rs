@@ -481,6 +481,17 @@ impl BookMove {
 	pub fn plays(&self) -> usize {
 		self.win + self.draw + self.loss
 	}
+
+	/// perf
+	pub fn perf(&self) -> usize {
+		let plays = self.plays();
+
+		if plays == 0 {
+			return 0
+		}
+
+		( ( ( 2 * self.win ) + self.draw ) * 50 ) / plays
+	}
 }
 
 /// book position
@@ -516,8 +527,19 @@ impl BookPosition {
 		accum
 	}
 
+	/// total perf
+	pub fn total_perf(&self) -> usize {
+		let mut accum = 0;
+
+		for (_, m) in &self.moves {
+			accum += m.perf();
+		}
+
+		accum
+	}
+
 	/// get random weighted move
-	pub fn get_random_weighted(&self) -> Option<&BookMove> {
+	pub fn get_random_weighted_by_plays(&self) -> Option<&BookMove> {
 		let mut rng = rand::thread_rng();
 
 		let t = self.total_plays();
@@ -540,6 +562,44 @@ impl BookPosition {
 
 		return None
 	}
+
+	/// get random weighted move
+	pub fn get_random_weighted_by_perf(&self) -> Option<&BookMove> {
+		let mut rng = rand::thread_rng();
+
+		let t = self.total_perf();
+
+		if t == 0 {
+			return None;
+		}
+
+		let r = rng.gen_range(0..t);
+
+		let mut accum = 0;
+
+		for (_, m) in &self.moves {
+			accum += m.perf();
+
+			if accum >= r {
+				return Some(m);
+			}
+		}
+
+		return None
+	}
+
+	/// get random move by mixed staretgy
+	pub fn get_random_mixed(&self, plays_weight: usize) -> Option<&BookMove> {
+		let mut rng = rand::thread_rng();
+		
+		let r = rng.gen_range(0..100);
+
+		if r <= plays_weight {
+			return self.get_random_weighted_by_plays();
+		}
+
+		self.get_random_weighted_by_perf()
+	}
 }
 
 /// book
@@ -547,6 +607,8 @@ impl BookPosition {
 pub struct Book {
 	/// positions
 	pub positions: std::collections::HashMap<String, BookPosition>,
+	/// max depth
+	pub max_depth: usize,
 }
 
 /// get turn of epd
@@ -565,7 +627,18 @@ impl Book {
 	pub fn new() -> Book {
 		Book {
 			positions: std::collections::HashMap::new(),
+			max_depth: 20,
 		}
+	}
+
+	/// set max depth
+	pub fn max_depth<T>(mut self, max_depth: T) -> Book
+	where T: core::fmt::Display {
+		if let Ok(max_depth) = max_depth.to_string().parse() {
+			self.max_depth = max_depth;
+		}
+
+		self
 	}
 
 	/// parse file to book
@@ -583,7 +656,17 @@ impl Book {
 					_ => 1,
 				};
 
-				for m in parsed.moves {
+				let mut max_move = self.max_depth;
+
+				let len = parsed.moves.len();
+
+				if len < max_move {
+					max_move = len;
+				}
+
+				for i in 0..max_move {
+					let m = &parsed.moves[i];
+
 					let pos = self.positions.entry(m.epd_before.to_owned()).or_insert(BookPosition::new(m.epd_before.to_owned()));
 
 					let pm = pos.moves.entry(m.uci.to_owned()).or_insert(BookMove::new(m.uci.to_owned(), m.san.to_owned()));
