@@ -17,15 +17,17 @@ fn main(){
 	
 	println!("{}", result);
 
-	let iter = PgnIterator::new("test.pgn");
+	let mut book = Book::new();
 
-	let mut i = 0;
+	book.parse("test.pgn");
 
-	if let Some(iter) = iter {
-		for pgn in iter {
-			println!("************\npgn {}\n************\n\n{}", i + 1, pgn);
+	let pos = book.positions.get("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
 
-			i += 1;
-		}
+	println!("pos for epd = {:?}", pos);
+
+	if let Some(pos) = pos {
+		let m = pos.get_random_weighted();
+
+		println!("random weighted move = {:?}", m);
 	}
 }

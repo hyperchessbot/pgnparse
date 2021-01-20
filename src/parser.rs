@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
+use rand::Rng;
 
 /// variant enum
 #[derive(Debug)]
@@ -445,4 +446,160 @@ impl std::iter::Iterator for PgnIterator {
         	}
         }        
     }
+}
+
+/// book move
+#[derive(Debug)]
+pub struct BookMove {
+	/// white wins
+	pub win: usize,
+	/// draw
+	pub draw: usize,
+	/// black wins
+	pub loss: usize,
+	/// uci
+	pub uci: String,
+	/// san
+	pub san: String,
+}
+
+/// book move implementation
+impl BookMove {
+	/// new book move
+	pub fn new<U, S>(uci: U, san: S) -> BookMove
+	where U: core::fmt::Display, S: core::fmt::Display {
+		BookMove {
+			win: 0,
+			draw: 0,
+			loss: 0,
+			uci: uci.to_string(),
+			san: san.to_string(),
+		}
+	}
+
+	/// plays
+	pub fn plays(&self) -> usize {
+		self.win + self.draw + self.loss
+	}
+}
+
+/// book position
+#[derive(Debug)]
+pub struct BookPosition {
+	/// epd
+	pub epd: String,
+	/// moves
+	pub moves: std::collections::HashMap<String, BookMove>,
+}
+
+/// book position implmenetation
+impl BookPosition {
+	/// new book position
+	pub fn new<T>(epd: T) -> BookPosition 
+	where T: core::fmt::Display {
+		let epd = epd.to_string();
+
+		BookPosition {
+			epd: epd,
+			moves: std::collections::HashMap::new(),
+		}
+	}
+
+	/// total plays
+	pub fn total_plays(&self) -> usize {
+		let mut accum = 0;
+
+		for (_, m) in &self.moves {
+			accum += m.plays();
+		}
+
+		accum
+	}
+
+	/// get random weighted move
+	pub fn get_random_weighted(&self) -> Option<&BookMove> {
+		let mut rng = rand::thread_rng();
+
+		let t = self.total_plays();
+
+		if t == 0 {
+			return None;
+		}
+
+		let r = rng.gen_range(0..t);
+
+		let mut accum = 0;
+
+		for (_, m) in &self.moves {
+			accum += m.plays();
+
+			if accum >= r {
+				return Some(m);
+			}
+		}
+
+		return None
+	}
+}
+
+/// book
+#[derive(Debug)]
+pub struct Book {
+	/// positions
+	pub positions: std::collections::HashMap<String, BookPosition>,
+}
+
+/// get turn of epd
+pub fn turn_white<T>(epd: T) -> bool
+where T: core::fmt::Display {
+	let epd = epd.to_string();
+
+	let parts:Vec<&str> = epd.split(" ").collect();
+
+	parts[1] == "w"
+}
+
+/// book implementation
+impl Book {
+	/// new book
+	pub fn new() -> Book {
+		Book {
+			positions: std::collections::HashMap::new(),
+		}
+	}
+
+	/// parse file to book
+	pub fn parse<T>(&mut self, filename: T)
+	where T: AsRef<Path> {
+		let iter = PgnIterator::new(filename);
+
+		if let Some(iter) = iter {
+			for pgn in iter {
+				let mut parsed = parse_pgn_to_rust_struct(pgn);
+
+				let result = match parsed.get_header("Result").as_str() {
+					"1-0" => 2,
+					"0-1" => 0,
+					_ => 1,
+				};
+
+				for m in parsed.moves {
+					let pos = self.positions.entry(m.epd_before.to_owned()).or_insert(BookPosition::new(m.epd_before.to_owned()));
+
+					let pm = pos.moves.entry(m.uci.to_owned()).or_insert(BookMove::new(m.uci.to_owned(), m.san.to_owned()));
+
+					let result_wrt = match turn_white(m.epd_before.to_owned()) {
+						true => result,
+						_ => 2 - result,
+					};
+
+					match result_wrt {
+						2 => pm.win += 1,
+						1 => pm.draw += 1,
+						_ => pm.loss += 1,
+					}
+				}
+			}
+		}
+	}
 }
