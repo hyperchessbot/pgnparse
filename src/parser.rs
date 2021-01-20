@@ -324,7 +324,9 @@ impl Visitor for ParsingState {
 }
 
 /// parse pgn to json string
-pub fn parse_pgn_to_json_string(pgn_str: String) -> String {
+pub fn parse_pgn_to_json_string<T>(pgn_str: T) -> String
+where T: core::fmt::Display {
+	let pgn_str = pgn_str.to_string();
 	let pgn_bytes = pgn_str.as_bytes();
 		
 	let mut reader = BufferedReader::new_cursor(&pgn_bytes);
@@ -341,8 +343,9 @@ pub fn parse_pgn_to_json_string(pgn_str: String) -> String {
 }
 
 /// parse pgn to rust struct
-pub fn parse_pgn_to_rust_struct(pgn_str: String) -> PgnInfo {
-	let parse_result = parse_pgn_to_json_string(pgn_str);
+pub fn parse_pgn_to_rust_struct<T>(pgn_str: T) -> PgnInfo 
+where T: core::fmt::Display {
+	let parse_result = parse_pgn_to_json_string(pgn_str.to_string());
 		
 	match serde_json::from_str::<PgnInfo>(&parse_result) {
 		Ok(pgn_info) => pgn_info,
