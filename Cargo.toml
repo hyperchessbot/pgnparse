@@ -1,6 +1,6 @@
 [package]
 name = "pgnparse"
-version = "0.1.13"
+version = "0.1.14"
 authors = ["hyperchessbot <hyperchessbot@gmail.com>"]
 edition = "2018"
 keywords = ["pgn", "parse", "rust", "json"]
@@ -8,8 +8,9 @@ description = "Parse PGN to Rust struct ( headers as hash map, main line moves a
 license = "MIT"
 repository = "https://github.com/hyperchessbot/pgnparse"
 homepage = "https://github.com/hyperchessbot/pgnparse#pgnparse"
-documentation = "https://docs.rs/pgnparse/0.1.13"
+documentation = "https://docs.rs/pgnparse/0.1.14"
 readme = "ReadMe.md"
+default-run = "usage"
 
 [dependencies]
 shakmaty = "0.17.1"
@@ -17,9 +18,15 @@ pgn-reader = "0.16.0"
 serde = { version = "1.0.118", features = ["derive"] }
 serde_json = "1.0.61"
 rand = "0.8.0"
+log = "0.4.11"
+env_logger = "0.8.2"
 
 [[bin]]
-name = "pgnparse"
-path = "src/pgnparse.rs"
+name = "usage"
+path = "src/usage.rs"
+
+[[bin]]
+name = "advanced"
+path = "src/advanced.rs"
 
 [lib]

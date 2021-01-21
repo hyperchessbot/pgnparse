@@ -1,10 +1,13 @@
-//! A library for parsing a PGN to Rust struct or JSON.
+//!
 //!
 //! # Examples
 //!
-//! Parse a variant PGN with custom starting position:
 //!
-//! ```
+//! ## Usage
+//!
+//!```
+//!extern crate env_logger;
+//!
 //!use pgnparse::parser::*;
 //!
 //!fn main(){
@@ -16,23 +19,51 @@
 //!1. Kh2 Kg2
 //!"#;
 //!	
-//!	let result = parse_pgn_to_rust_struct(pgn.to_string());
+//!	let result = parse_pgn_to_rust_struct(pgn);
 //!	
 //!	println!("{:?}", result);
 //!	
-//!	let result = parse_pgn_to_json_string(pgn.to_string());
+//!	let result = parse_pgn_to_json_string(pgn);
 //!	
 //!	println!("{}", result);
 //!}
-//! ```
+//!```
+//!
+//!
+//! ## Advanced
+//!
+//!```
+//!extern crate env_logger;
+//!
+//!use pgnparse::parser::*;
+//!
+//!fn main(){
+//!	let mut book = Book::new();
+//!
+//!	book.parse("test.pgn");
+//!
+//!	let pos = book.positions.get("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+//!
+//!	println!("pos for epd = {:?}", pos);
+//!
+//!	if let Some(pos) = pos {
+//!		let m = pos.get_random_weighted_by_plays();
+//!
+//!		println!("random weighted by plays = {:?} , plays = {}", m, m.unwrap().plays());
+//!
+//!		let m = pos.get_random_weighted_by_perf();
+//!
+//!		println!("random weighted by perf = {:?} , perf = {}", m, m.unwrap().perf());
+//!
+//!		let m = pos.get_random_mixed(50);
+//!
+//!		println!("random mixed = {:?}", m);
+//!	}
+//!}
+//!```
 //!
 
-pub mod parser;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+// lib
+
+pub mod parser;

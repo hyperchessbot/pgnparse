@@ -1,12 +1,14 @@
-# pgnparse
-
 [![documentation](https://docs.rs/pgnparse/badge.svg)](https://docs.rs/pgnparse) [![Crates.io](https://img.shields.io/crates/v/pgnparse.svg)](https://crates.io/crates/pgnparse) [![Crates.io (recent)](https://img.shields.io/crates/dr/pgnparse)](https://crates.io/crates/pgnparse)
 
-Parse PGN to Rust struct ( headers as hash map, main line moves as san, uci, fen, epd records ) or to JSON. All lichess variants are supported. Custom starting position using FEN header is supported.
+# pgnparse
+
+Parse PGN to Rust struct ( headers as hash map, main line moves as san, uci, fen, epd records ) or to JSON. All lichess variants are supported. Custom starting position using FEN header is supported. Create a book of parsed pgns.
 
 # Usage
 
 ```rust
+extern crate env_logger;
+
 use pgnparse::parser::*;
 
 fn main(){
@@ -18,20 +20,52 @@ fn main(){
 1. Kh2 Kg2
 "#;
 	
-	let result = parse_pgn_to_rust_struct(pgn.to_string());
+	let result = parse_pgn_to_rust_struct(pgn);
 	
 	println!("{:?}", result);
 	
-	let result = parse_pgn_to_json_string(pgn.to_string());
+	let result = parse_pgn_to_json_string(pgn);
 	
 	println!("{}", result);
 }
 ```
 
-prints
+# Advanced
 
+```rust
+extern crate env_logger;
+
+use pgnparse::parser::*;
+
+fn main(){
+	let mut book = Book::new();
+
+	book.parse("test.pgn");
+
+	let pos = book.positions.get("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -");
+
+	println!("pos for epd = {:?}", pos);
+
+	if let Some(pos) = pos {
+		let m = pos.get_random_weighted_by_plays();
+
+		println!("random weighted by plays = {:?} , plays = {}", m, m.unwrap().plays());
+
+		let m = pos.get_random_weighted_by_perf();
+
+		println!("random weighted by perf = {:?} , perf = {}", m, m.unwrap().perf());
+
+		let m = pos.get_random_mixed(50);
+
+		println!("random mixed = {:?}", m);
+	}
+}
 ```
-PgnInfo { headers: {"Variant": "Atomic", "White": "White", "Black": "Black", "FEN": "8/8/8/8/8/7k/8/7K w - - 0 1"}, moves: [SanUciFenEpd { san: "Kh2", uci: "h1h2", fen_before: "8/8/8/8/8/7k/8/7K w - - 0 1", epd_before: "8/8/8/8/8/7k/8/7K w - -", fen_after: "8/8/8/8/8/7k/7K/8 b - - 1 1", epd_after: "8/8/8/8/8/7k/7K/8 b - -" }, SanUciFenEpd { san: "Kg2", uci: "h3g2", fen_before: "8/8/8/8/8/7k/7K/8 b - - 1 1", epd_before: "8/8/8/8/8/7k/7K/8 b - -", fen_after: "8/8/8/8/8/8/6kK/8 w - - 2 2", epd_after: "8/8/8/8/8/8/6kK/8 w - -" }] }
-{"headers":{"Black":"Black","Variant":"Atomic","FEN":"8/8/8/8/8/7k/8/7K w - - 0 1","White":"White"},"moves":[{"san":"Kh2","uci":"h1h2","fen_before":"8/8/8/8/8/7k/8/7K w - - 0 1","epd_before":"8/8/8/8/8/7k/8/7K w - -","fen_after":"8/8/8/8/8/7k/7K/8 b - - 1 1","epd_after":"8/8/8/8/8/7k/7K/8 b - -"},{"san":"Kg2","uci":"h3g2","fen_before":"8/8/8/8/8/7k/7K/8 b - - 1 1","epd_before":"8/8/8/8/8/7k/7K/8 b - -","fen_after":"8/8/8/8/8/8/6kK/8 w - - 2 2","epd_after":"8/8/8/8/8/8/6kK/8 w - -"}]}
 
+# Logging
+
+```bash
+export RUST_LOG=info
+# or
+export RUST_LOG=debug
 ```
