@@ -3,7 +3,9 @@ extern crate env_logger;
 use pgnparse::parser::*;
 
 fn main(){
-	let mut book = Book::new();
+	env_logger::init();
+
+	let mut book = Book::new().me("chesshyperbot");
 
 	book.parse("test.pgn");
 

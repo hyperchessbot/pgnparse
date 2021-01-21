@@ -1,3 +1,5 @@
+use log::{log_enabled, info, Level};
+
 use shakmaty::variants::{Antichess, Atomic, Chess, Crazyhouse, Horde, KingOfTheHill, RacingKings, ThreeCheck};
 use shakmaty::san::{San};
 use shakmaty::uci::{Uci};
@@ -609,6 +611,8 @@ pub struct Book {
 	pub positions: std::collections::HashMap<String, BookPosition>,
 	/// max depth
 	pub max_depth: usize,
+	/// me
+	pub me: Option<String>,
 }
 
 /// get turn of epd
@@ -628,7 +632,16 @@ impl Book {
 		Book {
 			positions: std::collections::HashMap::new(),
 			max_depth: 20,
+			me: None,
 		}
+	}
+
+	/// set me
+	pub fn me<T>(mut self, me: T) -> Book
+	where T: core::fmt::Display {
+		self.me = Some(me.to_string());
+
+		self
 	}
 
 	/// set max depth
@@ -643,12 +656,37 @@ impl Book {
 
 	/// parse file to book
 	pub fn parse<T>(&mut self, filename: T)
-	where T: AsRef<Path> {
+	where T: AsRef<Path> + std::fmt::Display {		
+		let show_filename = filename.to_string();
+
+		if log_enabled!(Level::Info) {
+			info!("parsing {}", show_filename);
+		}
+
 		let iter = PgnIterator::new(filename);
+
+		let mut games = 0;
+		let mut moves = 0;
+		let mut parsed_moves = 0;
+		let mut me_white = 0;
+		let mut me_black = 0;
 
 		if let Some(iter) = iter {
 			for pgn in iter {
 				let mut parsed = parse_pgn_to_rust_struct(pgn);
+
+				if let Some(me) = self.me.to_owned() {
+					let white = parsed.get_header("White");
+					let black = parsed.get_header("Black");
+
+					if me == white {
+						me_white += 1;
+					}
+
+					if me == black {
+						me_black += 1;
+					}
+				}
 
 				let result = match parsed.get_header("Result").as_str() {
 					"1-0" => 2,
@@ -663,6 +701,10 @@ impl Book {
 				if len < max_move {
 					max_move = len;
 				}
+
+				games += 1;
+				moves += len;
+				parsed_moves += max_move;
 
 				for i in 0..max_move {
 					let m = &parsed.moves[i];
@@ -683,6 +725,10 @@ impl Book {
 					}
 				}
 			}
+		}
+
+		if log_enabled!(Level::Info) {
+			info!("parsing {} done, total games {}, total moves {}, parsed moves {}, me white {}, me black {}", show_filename, games, moves, parsed_moves, me_white, me_black);
 		}
 	}
 }
