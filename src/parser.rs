@@ -14,7 +14,7 @@ use std::path::Path;
 use rand::Rng;
 
 /// variant enum
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Variant{
 	VariantAntichess,
 	VariantAtomic,	
@@ -31,7 +31,7 @@ pub enum Variant{
 use Variant::*;
 
 /// san, uci, fen, epd for move
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SanUciFenEpd {
 	pub san: String,
 	pub uci: String,
@@ -42,7 +42,7 @@ pub struct SanUciFenEpd {
 }
 
 /// pgn headers and moves
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct PgnInfo {
 	pub headers: std::collections::HashMap<String, String>,
 	pub moves: Vec<SanUciFenEpd>,
@@ -451,7 +451,7 @@ impl std::iter::Iterator for PgnIterator {
 }
 
 /// book move
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BookMove {
 	/// white wins
 	pub win: usize,
@@ -497,7 +497,7 @@ impl BookMove {
 }
 
 /// book position
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BookPosition {
 	/// epd
 	pub epd: String,
@@ -605,7 +605,7 @@ impl BookPosition {
 }
 
 /// book
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Book {
 	/// positions
 	pub positions: std::collections::HashMap<String, BookPosition>,
